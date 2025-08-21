@@ -3,12 +3,47 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Cat Generator</title>
+  <title>Welcome to my Kitty Korner :)</title>
   <style>
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif }
     body { margin: 0; display: grid; place-items: center; min-height: 100dvh; background: #0f172a; color: #e2e8f0 }
     .card { width: min(900px, 92vw); background: #111827; border: 1px solid #1f2937; border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgb(0 0 0 / 0.3) }
-    h1 { margin: 0 0 10px; font-weight: 700; letter-spacing: .3px }
+    h1 { 
+      margin: 0 0 10px; 
+      font-weight: 700; 
+      letter-spacing: .3px;
+      background: linear-gradient(45deg, #ff69b4, #ff1493, #ff69b4, #ff1493);
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: glitter 3s ease-in-out infinite;
+      text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+      position: relative;
+    }
+    
+    h1::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.8) 50%, transparent 70%);
+      background-size: 200% 200%;
+      animation: sparkle 2s linear infinite;
+      pointer-events: none;
+    }
+    
+    @keyframes glitter {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    @keyframes sparkle {
+      0% { background-position: -200% -200%; }
+      100% { background-position: 200% 200%; }
+    }
     p  { margin: 0 0 18px; opacity: .8 }
     .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px }
     input[type="text"] { flex: 1 1 220px; padding: 10px 12px; border-radius: 10px; border: 1px solid #334155; background: #0b1220; color: #e2e8f0 }
@@ -25,7 +60,7 @@
 </head>
 <body>
   <div class="card">
-    <h1>🐱 Cat Generator</h1>
+    <h1>🐱 Welcome to my Kitty Korner :)</h1>
     <p>Click “Generate Cat” for a fresh cat photo. Add optional text to overlay on the image.</p>
 
     <div class="actions">
