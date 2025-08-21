@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to my Kitty Korner! :)</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        .cat-container { display: flex; justify-content: center; }
+        img { max-width: 400px; border-radius: 10px; margin-top: 20px; display: block; }
+        button { padding: 10px 20px; font-size: 16px; }
+        .glitter-title {
+            font-size: 2.5em;
+            font-weight: 700;
+            background: linear-gradient(45deg, #ff69b4, #ff1493, #ff69b4, #ff1493);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glitter 3s ease-in-out infinite;
+            text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+            position: relative;
+        }
+        .glitter-title::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.8) 50%, transparent 70%);
+            background-size: 200% 200%;
+            animation: sparkle 2s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes glitter {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        @keyframes sparkle {
+            0% { background-position: -200% -200%; }
+            100% { background-position: 200% 200%; }
+        }
+    </style>
+</head>
+<body>
+    <h1 class="glitter-title">Welcome to my Kitty Korner! :)</h1>
+    <button id="cat-btn">Show me a cat!</button>
+    <div class="cat-container">
+        <img id="cat-img" src="" alt="Random Cat" style="display:none;">
+    </div>
+    <script>
+        const btn = document.getElementById('cat-btn');
+        const img = document.getElementById('cat-img');
+
+        async function fetchCat() {
+            btn.disabled = true;
+            btn.textContent = "Loading...";
+            try {
+                const res = await fetch('https://api.thecatapi.com/v1/images/search');
+                const data = await res.json();
+                if (data && data[0] && data[0].url) {
+                    img.src = data[0].url;
+                    img.style.display = 'block';
+                } else {
+                    alert('No cat image found.');
+                }
+            } catch (e) {
+                alert('Failed to load cat image.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Show me a cat!";
+            }
+        }
+
+        btn.addEventListener('click', fetchCat);
+    </script>
+</body>
+</html>
