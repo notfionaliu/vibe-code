@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Welcome to my Kitty Korner :)</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif }
+    body { margin: 0; display: grid; place-items: center; min-height: 100dvh; background: #0f172a; color: #e2e8f0 }
+    .card { width: min(900px, 92vw); background: #111827; border: 1px solid #1f2937; border-radius: 16px; padding: 20px; box-shadow: 0 10px 30px rgb(0 0 0 / 0.3) }
+    h1 { 
+      margin: 0 0 10px; 
+      font-weight: 700; 
+      letter-spacing: .3px;
+      background: linear-gradient(45deg, #ff69b4, #ff1493, #ff69b4, #ff1493);
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: glitter 3s ease-in-out infinite;
+      text-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+      position: relative;
+    }
+    
+    h1::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.8) 50%, transparent 70%);
+      background-size: 200% 200%;
+      animation: sparkle 2s linear infinite;
+      pointer-events: none;
+    }
+    
+    @keyframes glitter {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    @keyframes sparkle {
+      0% { background-position: -200% -200%; }
+      100% { background-position: 200% 200%; }
+    }
+    p  { margin: 0 0 18px; opacity: .8 }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px }
+    input[type="text"] { flex: 1 1 220px; padding: 10px 12px; border-radius: 10px; border: 1px solid #334155; background: #0b1220; color: #e2e8f0 }
+    button { padding: 10px 14px; border: 1px solid #334155; background: #0b1220; color: #e2e8f0; border-radius: 10px; cursor: pointer }
+    button:hover { background: #111827 }
+    .img-wrap { aspect-ratio: 16/10; width: 100%; background: #0b1220; border: 1px dashed #334155; border-radius: 12px; display: grid; place-items: center; overflow: hidden }
+    img { max-width: 100%; max-height: 100%; display: none; }
+    .loading { opacity: .6; }
+    .error { color: #fecaca }
+    .row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px }
+    a { color: #93c5fd; text-decoration: none }
+    a:hover { text-decoration: underline }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🐱 Welcome to my Kitty Korner :)</h1>
+    <p>Click “Generate Cat” for a fresh cat photo. Add optional text to overlay on the image.</p>
+
+    <div class="actions">
+      <input id="overlayText" type="text" placeholder="Optional overlay text (e.g., Meow)" />
+      <button id="btn">Generate Cat</button>
+      <button id="downloadBtn" disabled>Download</button>
+      <span id="status" class="loading" aria-live="polite"></span>
+    </div>
+
+    <div class="img-wrap">
+      <img id="cat" alt="A very good cat" />
+    </div>
+
+    <div class="row">
+      <small>Powered by <a href="https://cataas.com" target="_blank" rel="noreferrer">cataas.com</a></small>
+      <small id="error" class="error"></small>
+    </div>
+  </div>
+
+  <script>
+    const btn = document.getElementById('btn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const img = document.getElementById('cat');
+    const statusEl = document.getElementById('status');
+    const errorEl = document.getElementById('error');
+    const overlayInput = document.getElementById('overlayText');
+
+    function buildUrl() {
+      const ts = Date.now(); // bust cache
+      const text = overlayInput.value.trim();
+      const base = text
+        ? `https://cataas.com/cat/says/${encodeURIComponent(text)}`
+        : `https://cataas.com/cat`;
+      // You can tweak size & filters via query params
+      return `${base}?width=900&height=560&ts=${ts}`;
+    }
+
+    function setLoading(isLoading) {
+      statusEl.textContent = isLoading ? 'Loading…' : '';
+      img.classList.toggle('loading', isLoading);
+      errorEl.textContent = '';
+      if (isLoading) img.style.display = 'none';
+    }
+
+    async function loadCat() {
+      try {
+        setLoading(true);
+        const url = buildUrl();
+
+        // Preload to catch errors before swapping src
+        await new Promise((resolve, reject) => {
+          const probe = new Image();
+          probe.onload = resolve;
+          probe.onerror = reject;
+          probe.src = url;
+        });
+
+        img.src = url;
+        img.style.display = 'block';
+        downloadBtn.disabled = false;
+      } catch (e) {
+        errorEl.textContent = 'Failed to load cat. Try again.';
+        downloadBtn.disabled = true;
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function downloadImage() {
+      try {
+        const resp = await fetch(img.src, { mode: 'cors' });
+        const blob = await resp.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'cat.jpg';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      } catch {
+        errorEl.textContent = 'Download failed (browser/CORS blocked). Right-click → “Save image as…” instead.';
+      }
+    }
+
+    btn.addEventListener('click', loadCat);
+    downloadBtn.addEventListener('click', downloadImage);
+
+    // Load one on first visit
+    loadCat();
+  </script>
+</body>
+</html>
