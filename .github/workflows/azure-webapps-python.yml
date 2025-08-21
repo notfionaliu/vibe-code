@@ -41,13 +41,14 @@ jobs:
 
   # No Python setup needed for static site
 
-      - name: Upload artifact for deployment jobs
+      - name: Upload static site artifact for deployment jobs
         uses: actions/upload-artifact@v4
         with:
-          name: python-app
+          name: static-site
           path: |
             .
             !venv/
+            !.github/
 
   deploy:
     permissions:
@@ -59,10 +60,10 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - name: Download artifact from build job
+      - name: Download static site artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: python-app
+          name: static-site
           path: .
 
       - name: 'Deploy to Azure Web App'
